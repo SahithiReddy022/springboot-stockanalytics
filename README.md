@@ -1,4 +1,4 @@
-# SpringBoot-StockAnalytics-TN-Oct2025
+# Springboot Stockanalytics Tn Oct2025
 
 
 
