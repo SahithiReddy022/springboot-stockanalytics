@@ -26,6 +26,12 @@ public class StockPriceHistoryVO {
         return tradingDate;
     }
 
+    public Boolean getIsGoodStock(){
+        double close = this.closePrice.doubleValue();
+        double open = this.openPrice.doubleValue();
+        return close > open;
+    }
+
     public BigDecimal getOpenPrice() {
         return openPrice;
     }
