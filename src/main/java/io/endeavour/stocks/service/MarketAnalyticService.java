@@ -1,8 +1,11 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
 import io.endeavour.stocks.exception.StockNotFoundException;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,7 @@ import java.util.List;
 @Service
 public class MarketAnalyticService {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticService.class);
     @Autowired
     private StockPriceHistoryDAO stockPriceHistoryDAO;
 
@@ -33,6 +37,7 @@ public class MarketAnalyticService {
         List<StockPriceHistoryVO> stockPriceHistoryVOList = stockPriceHistoryDAO.getStockPriceHistoryForTickersForDateRang(
                 tickers, fromDate, toDate);
         if(stockPriceHistoryVOList.isEmpty()){
+            LOGGER.error("stockPriceHistoryVOList is empty. Check the request");
             throw new StockNotFoundException("No data found");
         }
         return stockPriceHistoryVOList;

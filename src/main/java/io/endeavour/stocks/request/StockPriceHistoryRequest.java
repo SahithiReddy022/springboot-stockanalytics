@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class StockPriceHistoryRequest {
+    private Long requestID;
     private List<String> tickers;
     @JsonFormat(pattern = "MM-dd-yyyy")
     private LocalDate toDate;
