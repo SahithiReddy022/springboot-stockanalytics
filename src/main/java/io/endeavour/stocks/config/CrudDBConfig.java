@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
@@ -18,25 +16,14 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = {"io.endeavour.stocks.repository.stocks"},
-        entityManagerFactoryRef = "entityManagerFactory",
-        transactionManagerRef = "transactionManager"
+        basePackages = {"io.endeavour.stocks.repository.crud"},
+        entityManagerFactoryRef = "crudEntityManagerFactory",
+        transactionManagerRef = "crudTransactionManager"
 )
-public class StocksDBConfig {
+public class CrudDBConfig {
     @Autowired
-    @Qualifier(value = "stocksDataSource")
+    @Qualifier(value = "crudDataSource")
     private DataSource dataSource;
-
-    @Bean
-    public JdbcTemplate getJdbcTemplate() {
-        return new JdbcTemplate(dataSource);
-    }
-
-    @Bean
-    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
-
 
     /***
      * This method is used to configure JPA with the following steps:
@@ -47,13 +34,13 @@ public class StocksDBConfig {
      * 5) Set the JPA implementation vendor object into the EntityManagerFactoryBean
      * @return EntityManagerFactoryBean
      */
-    @Bean(name = "entityManagerFactory")
+    @Bean(name = "crudEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         //1. Create an LocalContainerEntityManagerFactoryBean and give it the dataSource
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
         //2. Specify the package to scan for Entities
-        entityManagerFactoryBean.setPackagesToScan("io.endeavour.stocks.entity.stocks");
+        entityManagerFactoryBean.setPackagesToScan("io.endeavour.stocks.entity.crud");
         //3. Define an JPA provider, Hibernate in this case
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         //4. Provide the database vendor information to the JPA implementation library, which is POSTGRESQL
@@ -65,8 +52,8 @@ public class StocksDBConfig {
         return entityManagerFactoryBean;
     }
 
-    @Bean(name = "transactionManager")
-    public PlatformTransactionManager transactionManager(@Qualifier(value = "entityManagerFactory")
+    @Bean(name = "crudTransactionManager")
+    public PlatformTransactionManager transactionManager(@Qualifier(value = "crudEntityManagerFactory")
                                                          EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);

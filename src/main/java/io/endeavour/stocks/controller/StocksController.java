@@ -1,8 +1,10 @@
 package io.endeavour.stocks.controller;
 
+import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
 import io.endeavour.stocks.exception.StockNotFoundException;
 import io.endeavour.stocks.request.StockPriceHistoryRequest;
 import io.endeavour.stocks.service.MarketAnalyticService;
+import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +18,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequestMapping(value="/stocks")
 public class StocksController {
 
    private static Logger LOGGER = LoggerFactory.getLogger(StocksController.class);
 
     @Autowired
     private MarketAnalyticService marketAnalyticService;
+
 
     @GetMapping(value = "/dummy-stock-price")
     public StockPriceHistoryVO getDummyStockPriceHistoryVO(){
@@ -56,6 +60,11 @@ public class StocksController {
                 stockPriceHistoryRequest.getTickers(),
                 fromDate,
                 toDate);
+    }
+
+    @GetMapping(value="/stock-fundamentals")
+    public List<StockFundamentalsVO> getStockFundamentalsEntities(){
+        return marketAnalyticService.getStockFundamentalsEntities();
     }
 
     @ExceptionHandler({StockNotFoundException.class, ResponseStatusException.class, Exception.class})

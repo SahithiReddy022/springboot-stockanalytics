@@ -2,7 +2,11 @@ package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
+import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
 import io.endeavour.stocks.exception.StockNotFoundException;
+import io.endeavour.stocks.mapper.StockEntityMapper;
+import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +22,9 @@ public class MarketAnalyticService {
     private static Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticService.class);
     @Autowired
     private StockPriceHistoryDAO stockPriceHistoryDAO;
+
+    @Autowired
+    private StockFundamentalsRepository stockFundamentalsRepository;
 
     public StockPriceHistoryVO getDummyStockPriceHistoryVO() {
         return stockPriceHistoryDAO.getDummyStockPriceHistoryVO();
@@ -41,5 +48,13 @@ public class MarketAnalyticService {
             throw new StockNotFoundException("No data found");
         }
         return stockPriceHistoryVOList;
+    }
+
+    public List<StockFundamentalsVO> getStockFundamentalsEntities(){
+        List<StockFundamentalsEntity> stockFundamentalsEntities = stockFundamentalsRepository.findAll();
+
+        List<StockFundamentalsVO> stockFundamentalsVOList = StockEntityMapper.map(stockFundamentalsEntities);
+
+        return stockFundamentalsVOList;
     }
 }
