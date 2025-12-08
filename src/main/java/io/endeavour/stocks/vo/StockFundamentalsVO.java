@@ -11,6 +11,18 @@ public class StockFundamentalsVO {
     private BigDecimal marketCap;
     private Double currentRatio;
 
+    public StockFundamentalsVO(String tickerSymbol, Integer sectorId, Integer subSectorId,
+                               BigDecimal marketCap, Double currentRatio) {
+        this.tickerSymbol = tickerSymbol;
+        this.sectorId = sectorId;
+        this.subSectorId = subSectorId;
+        this.marketCap = marketCap;
+        this.currentRatio = currentRatio;
+    }
+
+    public StockFundamentalsVO() {
+    }
+
     public String getTickerSymbol() {
         return tickerSymbol;
     }

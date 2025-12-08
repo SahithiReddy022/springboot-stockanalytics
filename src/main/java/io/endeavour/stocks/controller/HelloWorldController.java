@@ -1,4 +1,4 @@
-package io.endeavour.stocks.controller;
+package io.endeavour.stocks.Controller;
 
 import java.time.LocalDate;
 import java.util.Collections;
