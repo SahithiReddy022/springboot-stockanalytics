@@ -14,6 +14,9 @@ public class SubSectorEntity {
     @Column(name = "subsector_name")
     private String subsectorName;
 
+    @Column(name = "sector_id")
+    private Integer sectorId;
+
     public SubSectorEntity() {}
 
     public Integer getSubsectorId() {
@@ -30,5 +33,13 @@ public class SubSectorEntity {
 
     public void setSubsectorName(String subsectorName) {
         this.subsectorName = subsectorName;
+    }
+
+    public Integer getSectorId() {
+        return sectorId;
+    }
+
+    public void setSectorId(Integer sectorId) {
+        this.sectorId = sectorId;
     }
 }

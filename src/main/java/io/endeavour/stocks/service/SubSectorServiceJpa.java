@@ -20,4 +20,5 @@ public class SubSectorServiceJpa {
     public SubSectorEntity getSubSectorById(Integer id) {
         return repository.findById(id).orElse(null);
     }
+
 }

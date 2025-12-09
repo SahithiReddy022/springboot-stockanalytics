@@ -1,5 +1,6 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.entity.crud.AddressEntity;
 import io.endeavour.stocks.entity.crud.PersonEntity;
 import io.endeavour.stocks.repository.crud.CrudJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,21 @@ public class CrudService {
         return crudRepository.findAll();
     }
 
+    public List<PersonEntity> getPersonEntitiesByFirstName(String firstName){
+        return crudRepository.findByFirstNameStartsWith(firstName);
+    }
+
     public Optional<PersonEntity> getPersonById(Integer personId) {
         return crudRepository.findById(personId);
     }
+
+    public PersonEntity savePerson(PersonEntity personEntity) {
+        List<AddressEntity> addressEntityList = personEntity.getAddressEntityList();
+        addressEntityList.stream()
+                .forEach(addressEntity -> addressEntity.setPersonEntity(personEntity));
+
+        PersonEntity savedPersonEntity = crudRepository.save(personEntity);
+        return savedPersonEntity;
+    }
 }
+

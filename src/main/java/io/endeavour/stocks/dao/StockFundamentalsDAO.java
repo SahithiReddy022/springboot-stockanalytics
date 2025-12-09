@@ -17,7 +17,7 @@ public class StockFundamentalsDAO {
     public List<StockFundamentalsVO> getFundamentals(List<String> tickers) {
 
         String sql = """
-            SELECT 
+            SELECT
                 ticker_symbol,
                 sector_id,
                 subsector_id,
