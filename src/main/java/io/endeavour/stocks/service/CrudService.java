@@ -2,6 +2,7 @@ package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.entity.crud.AddressEntity;
 import io.endeavour.stocks.entity.crud.PersonEntity;
+import io.endeavour.stocks.exception.PersonNotFoundException;
 import io.endeavour.stocks.repository.crud.CrudJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,23 @@ public class CrudService {
 
         PersonEntity savedPersonEntity = crudRepository.save(personEntity);
         return savedPersonEntity;
+    }
+
+    public PersonEntity updatePerson(Integer personId, PersonEntity personEntity) {
+        boolean personExists = crudRepository.existsById(personId);
+        if(!personExists){
+            throw new PersonNotFoundException();
+        }
+        return savePerson(personEntity);
+
+    }
+
+    public void deletePerson(Integer personId) {
+        boolean personExists = crudRepository.existsById(personId);
+        if(!personExists){
+            throw new PersonNotFoundException();
+        }
+        crudRepository.deleteById(personId);
     }
 }
 

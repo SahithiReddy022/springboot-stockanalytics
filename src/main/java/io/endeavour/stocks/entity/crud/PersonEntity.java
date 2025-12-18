@@ -20,7 +20,8 @@ public class PersonEntity {
 
     @OneToMany(mappedBy = "personEntity",
             fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<AddressEntity> addressEntityList;
 
     public Integer getPersonId() {

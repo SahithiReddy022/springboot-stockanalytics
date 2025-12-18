@@ -1,6 +1,7 @@
 package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
+import io.endeavour.stocks.entity.stocks.StockPriceHistoryEntity;
 import io.endeavour.stocks.exception.StockNotFoundException;
 import io.endeavour.stocks.request.StockPriceHistoryRequest;
 import io.endeavour.stocks.service.MarketAnalyticService;
@@ -9,6 +10,7 @@ import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,6 +67,12 @@ public class StocksController {
     @GetMapping(value="/stock-fundamentals")
     public List<StockFundamentalsVO> getStockFundamentalsEntities(){
         return marketAnalyticService.getStockFundamentalsEntities();
+    }
+
+    @GetMapping(value = "/stock-price-history/{tickerSymbol}/{tradingDate}")
+    public ResponseEntity<StockPriceHistoryEntity> getStockPriceHistory(@PathVariable String tickerSymbol,
+                                                                     @PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate tradingDate){
+       return ResponseEntity.of(marketAnalyticService.getStockPriceHistory(tickerSymbol, tradingDate));
     }
 
     @ExceptionHandler({StockNotFoundException.class, ResponseStatusException.class, Exception.class})

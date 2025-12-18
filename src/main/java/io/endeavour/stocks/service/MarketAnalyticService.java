@@ -3,9 +3,12 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
 import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
+import io.endeavour.stocks.entity.stocks.StockPriceHistoryEntity;
+import io.endeavour.stocks.entity.stocks.StockPriceHistoryPrimaryKey;
 import io.endeavour.stocks.exception.StockNotFoundException;
 import io.endeavour.stocks.mapper.StockEntityMapper;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MarketAnalyticService {
@@ -22,6 +26,9 @@ public class MarketAnalyticService {
     private static Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticService.class);
     @Autowired
     private StockPriceHistoryDAO stockPriceHistoryDAO;
+
+    @Autowired
+    private StockPriceHistoryRepository stockPriceHistoryRepository;
 
     @Autowired
     private StockFundamentalsRepository stockFundamentalsRepository;
@@ -57,4 +64,14 @@ public class MarketAnalyticService {
 
         return stockFundamentalsVOList;
     }
+
+    public Optional<StockPriceHistoryEntity> getStockPriceHistory(String tickerSymbol,
+                                                                  LocalDate tradingDate){
+        StockPriceHistoryPrimaryKey stockPriceHistoryPrimaryKey = new StockPriceHistoryPrimaryKey();
+        stockPriceHistoryPrimaryKey.setTickerSymbol(tickerSymbol);
+        stockPriceHistoryPrimaryKey.setTradingDate(tradingDate);
+        return stockPriceHistoryRepository.findById(stockPriceHistoryPrimaryKey);
+    }
+
+
 }
