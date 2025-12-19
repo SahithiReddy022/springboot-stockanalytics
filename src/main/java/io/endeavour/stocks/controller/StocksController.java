@@ -75,6 +75,18 @@ public class StocksController {
        return ResponseEntity.of(marketAnalyticService.getStockPriceHistory(tickerSymbol, tradingDate));
     }
 
+    @GetMapping(value="/top-stock-fundamentals")
+    public List<StockFundamentalsEntity> getTopStockFundamentalEntities(@RequestParam(required = false) String format){
+        return marketAnalyticService.getTopStockFundamentalEntities(format);
+    }
+
+    @GetMapping(value="/top-n-stock-fundamentals")
+    public List<StockFundamentalsEntity> getTopStockFundamentalEntities(
+            @RequestParam(required = false) String format,
+            @RequestParam Integer limit){
+        return marketAnalyticService.getTopNStockFundamentalEntities(format, limit);
+    }
+
     @ExceptionHandler({StockNotFoundException.class, ResponseStatusException.class, Exception.class})
     public ResponseEntity<String> handleException(Exception e){
         if(e instanceof StockNotFoundException){

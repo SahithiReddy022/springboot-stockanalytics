@@ -1,6 +1,7 @@
 package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.controller.StocksController;
+import io.endeavour.stocks.dao.StockFundamentalDAO;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
 import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
 import io.endeavour.stocks.entity.stocks.StockPriceHistoryEntity;
@@ -32,6 +33,9 @@ public class MarketAnalyticService {
 
     @Autowired
     private StockFundamentalsRepository stockFundamentalsRepository;
+
+    @Autowired
+    private StockFundamentalDAO stockFundamentalDAO;
 
     public StockPriceHistoryVO getDummyStockPriceHistoryVO() {
         return stockPriceHistoryDAO.getDummyStockPriceHistoryVO();
@@ -72,6 +76,38 @@ public class MarketAnalyticService {
         stockPriceHistoryPrimaryKey.setTradingDate(tradingDate);
         return stockPriceHistoryRepository.findById(stockPriceHistoryPrimaryKey);
     }
+
+    public List<StockFundamentalsEntity> getTopStockFundamentalEntities(String format) {
+
+        List<StockFundamentalsEntity> stockFundamentalsEntities = null;
+        if (format == null || format.isEmpty()) {
+            stockFundamentalsEntities= stockFundamentalsRepository.findByCurrentRatioIsNotNull();
+        }else if (format.equalsIgnoreCase("jpql")) {
+            stockFundamentalsEntities= stockFundamentalsRepository.getStockFundamentalsUsingJPQL();
+        } else if (format.equalsIgnoreCase("sql")) {
+            stockFundamentalsEntities= stockFundamentalsRepository.getStockFundamentalsUsingSql();
+        }
+        return stockFundamentalsEntities;
+
+    }
+
+    public List<StockFundamentalsEntity> getTopNStockFundamentalEntities(String format,
+                                                                          Integer limit){
+        List<StockFundamentalsEntity>  stockFundamentalsEntities = null;
+        if (format.equalsIgnoreCase("jpql")) {
+            stockFundamentalsEntities = stockFundamentalDAO.getTopNStockFundamentalsEntitiesUsingJPQL(limit);
+        }else if(format.equalsIgnoreCase("cb")){
+            stockFundamentalsEntities = stockFundamentalDAO.getTopNStockFundamentalsEntitiesUsingCriteria(limit);
+        }
+        else {
+            stockFundamentalsEntities = stockFundamentalsRepository.getTopNStockFundamentals(limit);
+        }
+        return stockFundamentalsEntities;
+    }
+
+
+
+
 
 
 }
