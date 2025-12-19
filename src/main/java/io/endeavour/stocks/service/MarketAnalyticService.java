@@ -1,6 +1,5 @@
 package io.endeavour.stocks.service;
 
-import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockFundamentalDAO;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
 import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
@@ -12,6 +11,7 @@ import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +103,10 @@ public class MarketAnalyticService {
             stockFundamentalsEntities = stockFundamentalsRepository.getTopNStockFundamentals(limit);
         }
         return stockFundamentalsEntities;
+    }
+
+    public List<TopStockBySectorVO> getTopStockBySectorVOList(){
+        return stockFundamentalsRepository.getTopStockBySectorVO();
     }
 
 

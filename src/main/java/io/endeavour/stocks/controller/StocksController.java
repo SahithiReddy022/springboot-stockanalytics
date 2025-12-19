@@ -1,4 +1,4 @@
-package io.endeavour.stocks.controller;
+package io.endeavour.stocks.Controller;
 
 import io.endeavour.stocks.entity.stocks.StockFundamentalsEntity;
 import io.endeavour.stocks.entity.stocks.StockPriceHistoryEntity;
@@ -7,6 +7,7 @@ import io.endeavour.stocks.request.StockPriceHistoryRequest;
 import io.endeavour.stocks.service.MarketAnalyticService;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,11 @@ public class StocksController {
             @RequestParam(required = false) String format,
             @RequestParam Integer limit){
         return marketAnalyticService.getTopNStockFundamentalEntities(format, limit);
+    }
+
+    @GetMapping(value="/top-sector-stock")
+    public List<TopStockBySectorVO> getTopStockBySectorVOList(){
+        return marketAnalyticService.getTopStockBySectorVOList();
     }
 
     @ExceptionHandler({StockNotFoundException.class, ResponseStatusException.class, Exception.class})

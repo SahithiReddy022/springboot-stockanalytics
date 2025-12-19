@@ -1,13 +1,58 @@
 package io.endeavour.stocks.entity.stocks;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name="STOCK_FUNDAMENTALS", schema = "ENDEAVOUR")
+@NamedNativeQuery(
+        name = "StockFundamentals.topStockBySector",
+        query = """
+       WITH CAP_RANK_TABLE AS(
+                                      SELECT
+                                      	sl2.SECTOR_NAME,
+                                      	sf.SECTOR_ID,
+                                      	sl.TICKER_SYMBOL,
+                                      	sl.TICKER_NAME,
+                                      	sf.MARKET_CAP,
+                                      	RANK () OVER (PARTITION BY sf.SECTOR_ID ORDER BY sf.MARKET_CAP desc) AS CAP_RANK
+                                      FROM
+                                      	ENDEAVOUR.STOCK_FUNDAMENTALS sf,
+                                      	ENDEAVOUR.STOCKS_LOOKUP sl,
+                                      	ENDEAVOUR.SECTOR_LOOKUP sl2
+                                      WHERE
+                                      sf.TICKER_SYMBOL = sl.TICKER_SYMBOL
+                                      AND sf.SECTOR_ID = sl2.SECTOR_ID
+                                      AND sf.MARKET_CAP IS NOT NULL
+                                      )
+                                      SELECT
+                                      	SECTOR_NAME,
+                                      	SECTOR_ID,
+                                      	TICKER_SYMBOL,
+                                      	TICKER_NAME,
+                                      	MARKET_CAP
+                                      FROM
+                                      	CAP_RANK_TABLE
+                                      WHERE
+                                      	CAP_RANK = 1
+  
+   """,
+        resultSetMapping = "StockFundamentals.topStockBySectorMapping"
+)
+@SqlResultSetMapping(name = "StockFundamentals.topStockBySectorMapping",
+        classes = @ConstructorResult(targetClass = TopStockBySectorVO.class,
+                columns = {
+                        @ColumnResult(name = "SECTOR_ID", type = Integer.class),
+                        @ColumnResult(name = "SECTOR_NAME", type = String.class),
+                        @ColumnResult(name = "MARKET_CAP", type = BigDecimal.class),
+                        @ColumnResult(name = "TICKER_SYMBOL", type = String.class),
+                        @ColumnResult(name = "TICKER_NAME", type = String.class)
+                }
+        )
+)
+
 public class StockFundamentalsEntity {
     @Column(name="TICKER_SYMBOL")
     @Id
