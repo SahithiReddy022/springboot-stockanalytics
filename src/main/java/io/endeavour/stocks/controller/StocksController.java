@@ -8,6 +8,9 @@ import io.endeavour.stocks.service.MarketAnalyticService;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import io.endeavour.stocks.vo.TopStockBySectorVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value="/stocks")
+@Tag(name="Endeavour Stocks API",description = "Endeavour Stocks API")
 public class StocksController {
 
    private static Logger LOGGER = LoggerFactory.getLogger(StocksController.class);
@@ -40,6 +44,9 @@ public class StocksController {
         return marketAnalyticService.getStockPriceHistoryVOList(ticker);
     }
 
+    @Operation(description = "Return stock price history for ticker for date range")
+    @ApiResponse(responseCode = "400", description = "fromDate should be before toDate")
+    @ApiResponse(responseCode = "200", description = "Returns stock price history")
     @PostMapping(value = "/stock-price-history")
     public List<StockPriceHistoryVO> getStockPriceHistoryForTickers(@RequestBody
                                                                         StockPriceHistoryRequest stockPriceHistoryRequest){
@@ -91,6 +98,19 @@ public class StocksController {
     @GetMapping(value="/top-sector-stock")
     public List<TopStockBySectorVO> getTopStockBySectorVOList(){
         return marketAnalyticService.getTopStockBySectorVOList();
+    }
+
+    @GetMapping(value="/cumulative-return/{fromDate}/{toDate}")
+    public List<StockFundamentalsEntity> getStockFundamentalsWithCumulativeReturn(
+            @PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate fromDate,
+            @PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate toDate
+
+    ){
+        List<StockFundamentalsEntity> stockFundamentalsEntities =
+                marketAnalyticService.getCumulativeReturn(fromDate, toDate);
+        return stockFundamentalsEntities;
+
+
     }
 
     @ExceptionHandler({StockNotFoundException.class, ResponseStatusException.class, Exception.class})

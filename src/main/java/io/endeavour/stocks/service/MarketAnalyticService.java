@@ -9,17 +9,19 @@ import io.endeavour.stocks.exception.StockNotFoundException;
 import io.endeavour.stocks.mapper.StockEntityMapper;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
-import io.endeavour.stocks.vo.StockFundamentalsVO;
-import io.endeavour.stocks.vo.StockPriceHistoryVO;
-import io.endeavour.stocks.vo.TopStockBySectorVO;
+import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MarketAnalyticService {
@@ -36,6 +38,10 @@ public class MarketAnalyticService {
 
     @Autowired
     private StockFundamentalDAO stockFundamentalDAO;
+
+    @Autowired
+    private StockCalculationsClient stockCalculationsClient;
+
 
     public StockPriceHistoryVO getDummyStockPriceHistoryVO() {
         return stockPriceHistoryDAO.getDummyStockPriceHistoryVO();
@@ -108,6 +114,42 @@ public class MarketAnalyticService {
     public List<TopStockBySectorVO> getTopStockBySectorVOList(){
         return stockFundamentalsRepository.getTopStockBySectorVO();
     }
+
+    public List<StockFundamentalsEntity> getCumulativeReturn(LocalDate fromDate, LocalDate toDate){
+        List<StockFundamentalsEntity> stockFundamentalsEntities = stockFundamentalsRepository.findAll();
+
+        Map<String, StockFundamentalsEntity> stockEntityMap = stockFundamentalsEntities.stream()
+                .collect(Collectors.toMap(StockFundamentalsEntity::getTickerSymbol, Function.identity()));
+
+        List<String> tickers = stockFundamentalsEntities.stream()
+                .map(stockFundamentalsEntity -> stockFundamentalsEntity.getTickerSymbol())
+                .toList();
+
+        CumulativeReturnInputVO cumulativeReturnInputVO = new CumulativeReturnInputVO();
+        cumulativeReturnInputVO.setTickers(tickers);
+        List<CumulativeReturnOutputVO> cumulativeReturnOutputVOS = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, cumulativeReturnInputVO);
+
+        if(cumulativeReturnOutputVOS == null ){
+            throw new RuntimeException("Service is down");
+        }
+
+        cumulativeReturnOutputVOS.forEach(
+                cumulativeReturnOutputVO ->
+                {
+                    String tickerSymbol = cumulativeReturnOutputVO.getTickerSymbol();
+                    StockFundamentalsEntity stockFundamentalsEntity = stockEntityMap.get(tickerSymbol);
+                    stockFundamentalsEntity.setCumulativeReturn(cumulativeReturnOutputVO.getCumulativeReturn());
+                }
+        );
+
+        List<StockFundamentalsEntity> finalList = stockFundamentalsEntities.stream()
+                .filter(stockFundamentalsEntity -> stockFundamentalsEntity.getCumulativeReturn() != null)
+                .sorted(Comparator.comparing(StockFundamentalsEntity::getCumulativeReturn))
+                .toList();
+        return finalList;
+
+    }
+
 
 
 
