@@ -1,6 +1,7 @@
 package io.endeavour.stocks.Controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,28 +12,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class HelloWorldController {
 
-    @GetMapping(value = "/hello")
+    @GetMapping(value="/hello")
     public String sayHello(){
-        return "Hello Java Class Oct 2025";
-    }
+        return "hello Java Class Oct 2025";
+}
 
     @GetMapping(value = "/hello-name/{personName}")
     public String sayHelloWithName(@PathVariable String personName,
-                                   @RequestParam String city,
-                                   @RequestParam String state
-    ){
-        return "Hello " + personName + " Today is " + LocalDate.now() + " city " + city + " state " + state;
+                                   @RequestParam String city,  //means in url directly we can put sahithi?city=dallas&state=texas
+                                   @RequestParam String state){ //http://localhost:8080/hello-name/Sahithi?city=Dallas&state=Texas
+        return "Hello "+ personName+ " Today is "+LocalDate.now()+ " city "+city+ " state "+state;
     }
 
-    @GetMapping(value = "/hello-date/{date}")
-    public String sayHelloWithDate(@PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy")
-                                       LocalDate date){
-        return "Hello you entered the date " + date;
-    }
-
-    @PostMapping(value="/sort-tickers")
-    public List<String> sortTickers(@RequestBody List<String> tickers){
+    @PostMapping("/tickers")
+    public List<String > sortList (@RequestBody ArrayList<String> tickers){
         Collections.sort(tickers);
         return tickers;
     }
-}
+    }
