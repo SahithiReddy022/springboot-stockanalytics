@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 //we are telling spring that we are creating beans in this class with @beans
@@ -17,6 +18,10 @@ public class DatabaseConfig {
     @Bean
     public JdbcTemplate getJdbcTemplate(){
         return new JdbcTemplate(dataSource);
+    }
+
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(){
+        return new NamedParameterJdbcTemplate(dataSource);
     }
 
 

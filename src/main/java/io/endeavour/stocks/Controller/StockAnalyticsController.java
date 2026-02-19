@@ -2,15 +2,19 @@ package io.endeavour.stocks.Controller;
 
 
 import io.endeavour.stocks.service.StockAnalyticsService;
+import io.endeavour.stocks.vo.SectorLookupVO;
 import io.endeavour.stocks.vo.Stock;
+import io.endeavour.stocks.vo.StockPriceHistoryRequest;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/stocks")
@@ -29,6 +33,38 @@ public class StockAnalyticsController {
     @GetMapping("/stock-price-history/{tickerSymbol}")
     public List<StockPriceHistoryVO> getSingleStockPriceHistory(@PathVariable String tickerSymbol){
         return stockAnalyticsService.getSingleStockPriceHistory(tickerSymbol);
+    }
+
+    @GetMapping("/stock-price-history-date-range/{tickerSymbol}")
+    public List<StockPriceHistoryVO> getStockPriceHistory(@PathVariable String tickerSymbol,
+                                                          @RequestParam @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate fromDate,
+                                                          @RequestParam @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate toDate){
+        if(fromDate.compareTo(toDate)>0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"fromdate cannot be after todate");
+        }
+        return stockAnalyticsService.getStockPriceHistory(tickerSymbol,fromDate,toDate);
+    }
+
+@PostMapping("/stock-price-history")
+public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHistoryRequest stockPriceHistoryRequest,
+                                                       @RequestParam(name="sortField",required = false)Optional<String> sortFieldOptional,
+                                                       @RequestParam(name="sortDirection",required = false)Optional<String> sortDirectionOptional){
+
+    if(stockPriceHistoryRequest.getFromDate().compareTo(stockPriceHistoryRequest.getToDate())>0){
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"fromdate cannot be after todate");
+    }
+    return stockAnalyticsService.getStockPriceHistoryP(stockPriceHistoryRequest.getTickerSymbolList(),stockPriceHistoryRequest.getFromDate(),stockPriceHistoryRequest.getToDate(),
+            sortFieldOptional,sortDirectionOptional);
+}
+
+    @GetMapping("/sectors")
+    public List<SectorLookupVO> getSectorLookups(){
+        return stockAnalyticsService.getSectorLookups();
+    }
+
+    @GetMapping("/sectors/{sectorId}")
+    public SectorLookupVO getSectorLookupById(@PathVariable Integer sectorId){
+        return stockAnalyticsService.getSectorLookupById(sectorId);
     }
 
 }
