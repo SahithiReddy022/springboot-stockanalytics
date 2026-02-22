@@ -1,9 +1,8 @@
 package io.endeavour.stocks.repository.stocks;
 
-import io.endeavour.stocks.entity.stocks.SubSectorEntity;
+import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.relational.core.sql.In;
 
-@Repository
-public interface SubSectorRepository extends JpaRepository<SubSectorEntity, Integer> {
+public interface SubSectorRepository extends JpaRepository<SubSectorLookup, Integer> {
 }

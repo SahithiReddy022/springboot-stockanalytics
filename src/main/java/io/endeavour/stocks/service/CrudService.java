@@ -1,9 +1,7 @@
 package io.endeavour.stocks.service;
 
-import io.endeavour.stocks.entity.crud.AddressEntity;
-import io.endeavour.stocks.entity.crud.PersonEntity;
-import io.endeavour.stocks.exception.PersonNotFoundException;
-import io.endeavour.stocks.repository.crud.CrudJpaRepository;
+import io.endeavour.stocks.entity.crud.Person;
+import io.endeavour.stocks.repository.crud.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,44 +12,13 @@ import java.util.Optional;
 public class CrudService {
 
     @Autowired
-    private CrudJpaRepository crudRepository;
+    PersonRepository personRepository;
 
-    public List<PersonEntity> getPersonEntities(){
-        return crudRepository.findAll();
+    public List<Person> getAllPersons(){
+        return personRepository.findAll();
     }
 
-    public List<PersonEntity> getPersonEntitiesByFirstName(String firstName){
-        return crudRepository.findByFirstNameStartsWith(firstName);
-    }
-
-    public Optional<PersonEntity> getPersonById(Integer personId) {
-        return crudRepository.findById(personId);
-    }
-
-    public PersonEntity savePerson(PersonEntity personEntity) {
-        List<AddressEntity> addressEntityList = personEntity.getAddressEntityList();
-        addressEntityList.stream()
-                .forEach(addressEntity -> addressEntity.setPersonEntity(personEntity));
-
-        PersonEntity savedPersonEntity = crudRepository.save(personEntity);
-        return savedPersonEntity;
-    }
-
-    public PersonEntity updatePerson(Integer personId, PersonEntity personEntity) {
-        boolean personExists = crudRepository.existsById(personId);
-        if(!personExists){
-            throw new PersonNotFoundException();
-        }
-        return savePerson(personEntity);
-
-    }
-
-    public void deletePerson(Integer personId) {
-        boolean personExists = crudRepository.existsById(personId);
-        if(!personExists){
-            throw new PersonNotFoundException();
-        }
-        crudRepository.deleteById(personId);
+    public Optional<Person> getPerson(Integer personId){
+        return personRepository.findById(personId);
     }
 }
-

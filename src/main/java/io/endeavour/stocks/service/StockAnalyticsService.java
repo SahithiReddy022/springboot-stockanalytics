@@ -4,14 +4,17 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.dao.LookupDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
+import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.repository.StockFundamentalsRepository;
+import io.endeavour.stocks.entity.stocks.SubSectorLookup;
+import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
+import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.SubSectorRepository;
 import io.endeavour.stocks.vo.SectorLookupVO;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,7 +22,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @Service
@@ -33,6 +35,12 @@ public class StockAnalyticsService {
 
     @Autowired
     StockFundamentalsRepository stockFundamentalsRepository;
+
+    @Autowired
+    SectorLookupRepository sectorLookupRepository;
+
+    @Autowired
+    SubSectorRepository subSectorRepository;
 
 @Autowired
     public StockAnalyticsService(StockPriceHistoryDAO stockPriceHistoryDAO,LookupDAO lookupDAO,StockFundamentalsDAO stockFundamentalsDAO){
@@ -91,5 +99,20 @@ public class StockAnalyticsService {
     List<StockFundamentals> stockFundamentalsList=stockFundamentalsRepository.findAll();
     return stockFundamentalsList;
     }
+
+    public List<SectorLookup> getAllSectorsUsingJPA(){
+    List<SectorLookup> sectorLookupList= sectorLookupRepository.findAll();
+    return sectorLookupList;
+    }
+
+    public SectorLookup getSectorById(Integer id){
+    return sectorLookupRepository.findById(id).orElse(null);
+    }
+
+    public List<SubSectorLookup> getSubSectorUsingJPA(){
+    List<SubSectorLookup> subSectorLookupList=subSectorRepository.findAll();
+    return subSectorLookupList;
+    }
+
 
 }

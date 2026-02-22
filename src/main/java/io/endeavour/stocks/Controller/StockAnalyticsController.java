@@ -1,7 +1,9 @@
 package io.endeavour.stocks.Controller;
 
 
+import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,25 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
     @GetMapping("/stock-fundamentals-usingJPA")
     public List<StockFundamentals> getStockFundamentalsUsingJPA(){
         return stockAnalyticsService.getStockFundamentalsUsingJPA();
+    }
+
+    @GetMapping("/sector-lookup-usingJPA")
+    public List<SectorLookup> getAllSectorsUsingJPA(){
+        return stockAnalyticsService.getAllSectorsUsingJPA();
+    }
+
+    @GetMapping("/sector-lookup-JPA/{sectorID}")
+    public SectorLookup getSectorById(@PathVariable Integer sectorID){
+        SectorLookup sectorLookup= stockAnalyticsService.getSectorById(sectorID);
+        if(sectorLookup==null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sector not found");
+        }
+        return sectorLookup;
+    }
+
+    @GetMapping("/subsector-lookup-usingJPA")
+    public List<SubSectorLookup> getSubSectorUsingJPA(){
+        return stockAnalyticsService.getSubSectorUsingJPA();
     }
 
 }
