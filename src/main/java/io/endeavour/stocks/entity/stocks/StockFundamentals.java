@@ -1,25 +1,27 @@
-package io.endeavour.stocks.vo;
+package io.endeavour.stocks.entity.stocks;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
-public class StockFundamentalsVO {
+@Entity
+@Table(name = "STOCK_FUNDAMENTALS", schema = "ENDEAVOUR")
+public class StockFundamentals {
+    @Id
+    @Column(name = "TICKER_SYMBOL")
     private String tickerSymbol;
+    @Column(name = "SECTOR_ID")
     private Integer sectorId;
+    @Column(name = "SUBSECTOR_ID")
     private Integer subSectorId;
+    @Column(name = "MARKET_CAP")
     private BigDecimal marketCap;
+    @Column(name = "CURRENT_RATIO")
     private Double currentRatio;
 
-    public StockFundamentalsVO(String tickerSymbol,
-                               Integer sectorId,
-                               Integer subSectorId,
-                               BigDecimal marketCap,
-                               Double currentRatio) {
-        this.tickerSymbol = tickerSymbol;
-        this.sectorId = sectorId;
-        this.subSectorId = subSectorId;
-        this.marketCap = marketCap;
-        this.currentRatio = currentRatio;
-    }
     public String getTickerSymbol() {
         return tickerSymbol;
     }
@@ -62,7 +64,7 @@ public class StockFundamentalsVO {
 
     @Override
     public String toString() {
-        return "StockFundamentalsVO{" +
+        return "StockFundamentals{" +
                 "tickerSymbol='" + tickerSymbol + '\'' +
                 ", sectorId=" + sectorId +
                 ", subSectorId=" + subSectorId +

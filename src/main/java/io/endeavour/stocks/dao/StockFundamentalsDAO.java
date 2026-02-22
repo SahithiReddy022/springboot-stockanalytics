@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.logging.Logger;
+
+import static org.hibernate.tool.schema.SchemaToolingLogging.LOGGER;
 
 @Repository
 public class StockFundamentalsDAO {
@@ -16,8 +19,10 @@ public class StockFundamentalsDAO {
 
     public List<StockFundamentalsVO> getFundamentals(List<String> tickers) {
 
+    long startTime= System.currentTimeMillis();
+
         String sql = """
-            SELECT
+            SELECT 
                 ticker_symbol,
                 sector_id,
                 subsector_id,
@@ -30,7 +35,7 @@ public class StockFundamentalsDAO {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("tickers", tickers);
 
-        return namedParameterJdbcTemplate.query(sql, params, (rs, i) ->
+        List<StockFundamentalsVO> result = namedParameterJdbcTemplate.query(sql, params, (rs, i) ->
                 new StockFundamentalsVO(
                         rs.getString("ticker_symbol"),
                         rs.getInt("sector_id"),
@@ -39,5 +44,10 @@ public class StockFundamentalsDAO {
                         rs.getDouble("current_ratio")
                 )
         );
+
+        long endTime = System.currentTimeMillis();
+        LOGGER.info("StockFundamentalsDAO getFundamentals took: " + (endTime - startTime) + " ms");
+
+        return result;
     }
 }

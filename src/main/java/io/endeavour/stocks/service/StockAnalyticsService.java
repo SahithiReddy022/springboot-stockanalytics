@@ -2,9 +2,14 @@ package io.endeavour.stocks.service;
 
 
 import io.endeavour.stocks.dao.LookupDAO;
+import io.endeavour.stocks.dao.StockFundamentalsDAO;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.repository.StockFundamentalsRepository;
 import io.endeavour.stocks.vo.SectorLookupVO;
+import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -13,26 +18,36 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 public class StockAnalyticsService {
 
+    private static Logger LOGGER= LoggerFactory.getLogger(StockAnalyticsService.class);
     @Autowired
     private StockPriceHistoryDAO stockPriceHistoryDAO;
     private LookupDAO lookupDAO;
+    private StockFundamentalsDAO stockFundamentalsDAO;
+
+    @Autowired
+    StockFundamentalsRepository stockFundamentalsRepository;
 
 @Autowired
-    public StockAnalyticsService(StockPriceHistoryDAO stockPriceHistoryDAO,LookupDAO lookupDAO){
+    public StockAnalyticsService(StockPriceHistoryDAO stockPriceHistoryDAO,LookupDAO lookupDAO,StockFundamentalsDAO stockFundamentalsDAO){
     this.stockPriceHistoryDAO=stockPriceHistoryDAO;
     this.lookupDAO=lookupDAO;
+    this.stockFundamentalsDAO=stockFundamentalsDAO;
 }
     public List<StockPriceHistoryVO> getSingleStockPriceHistory(String tickerSymbol){
         return stockPriceHistoryDAO.getSingleStockPriceHistory(tickerSymbol);
     }
 
     public List<StockPriceHistoryVO> getStockPriceHistoryP(List<String> tickerSymbols, LocalDate fromDate, LocalDate toDate, Optional<String> sortFieldOptional,
-                                                           Optional<String > sortDirectionOptional){
+                                                           Optional<String> sortDirectionOptional){
 
+    LOGGER.info("getting stock price history for ticker symbols"+ tickerSymbols);
     List<StockPriceHistoryVO> stockPriceHistoryVOList=stockPriceHistoryDAO.getStockPriceHistoryForDateRange(tickerSymbols,fromDate,toDate);
 
     String sortField=sortFieldOptional.orElse("tradingDate");
@@ -66,6 +81,15 @@ public class StockAnalyticsService {
 
     public SectorLookupVO getSectorLookupById(Integer sectorId){
     return lookupDAO.getSectorLookupBySectorId(sectorId);
+    }
+
+    public List<StockFundamentalsVO> getFundamentals(List<String> tickers){
+    return stockFundamentalsDAO.getFundamentals(tickers);
+    }
+
+    public List<StockFundamentals> getStockFundamentalsUsingJPA(){
+    List<StockFundamentals> stockFundamentalsList=stockFundamentalsRepository.findAll();
+    return stockFundamentalsList;
     }
 
 }

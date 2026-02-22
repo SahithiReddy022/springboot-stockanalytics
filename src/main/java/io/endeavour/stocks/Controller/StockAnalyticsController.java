@@ -1,11 +1,9 @@
 package io.endeavour.stocks.Controller;
 
 
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.service.StockAnalyticsService;
-import io.endeavour.stocks.vo.SectorLookupVO;
-import io.endeavour.stocks.vo.Stock;
-import io.endeavour.stocks.vo.StockPriceHistoryRequest;
-import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import io.endeavour.stocks.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -65,6 +63,16 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
     @GetMapping("/sectors/{sectorId}")
     public SectorLookupVO getSectorLookupById(@PathVariable Integer sectorId){
         return stockAnalyticsService.getSectorLookupById(sectorId);
+    }
+
+    @PostMapping("/stock-fundamentals")
+    public List<StockFundamentalsVO> getFundamentals(@RequestBody List<String> tickers){
+        return stockAnalyticsService.getFundamentals(tickers);
+    }
+
+    @GetMapping("/stock-fundamentals-usingJPA")
+    public List<StockFundamentals> getStockFundamentalsUsingJPA(){
+        return stockAnalyticsService.getStockFundamentalsUsingJPA();
     }
 
 }

@@ -15,14 +15,6 @@ public class DatabaseConfig {
     @Autowired
     private DataSource dataSource;
 
-    @Bean
-    public JdbcTemplate getJdbcTemplate(){
-        return new JdbcTemplate(dataSource);
-    }
-
-    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(){
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
 
 
 }
