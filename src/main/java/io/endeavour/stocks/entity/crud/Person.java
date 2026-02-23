@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "PERSON",schema = "ENDEAVOUR_TEST_AREA")
 public class Person {
 @Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "PERSON_ID")
     Integer personId;
 @Column(name = "FIRST_NAME")
@@ -18,7 +19,7 @@ public class Person {
 @Column(name = "dob")
     LocalDate dob;
 
-@OneToMany(mappedBy = "person",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+@OneToMany(mappedBy = "person",cascade = CascadeType.ALL,fetch = FetchType.EAGER,orphanRemoval = true)
 List<Address> addressList;
 
     public List<Address> getAddressList() {

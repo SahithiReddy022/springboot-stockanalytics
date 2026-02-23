@@ -8,6 +8,7 @@ import javax.persistence.*;
 @Table(name = "ADDRESS",schema = "ENDEAVOUR_TEST_AREA")
 public class Address {
 @Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="ADDRESS_ID")
     Integer addressId;
     @Column(name = "LINE1")
@@ -19,7 +20,7 @@ public class Address {
     @Column(name = "STATE")
     String state;
     @Column(name = "ZIP_CODE")
-    String zip;
+    Integer zip;
 @JsonIgnore
 @ManyToOne
     @JoinColumn(name="PERSON_ID")
@@ -73,11 +74,11 @@ public class Address {
         this.state = state;
     }
 
-    public String getZip() {
+    public Integer getZip() {
         return zip;
     }
 
-    public void setZip(String zip) {
+    public void setZip(Integer zip) {
         this.zip = zip;
     }
 }
