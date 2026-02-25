@@ -4,11 +4,10 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.dao.LookupDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
 import io.endeavour.stocks.dao.StockPriceHistoryDAO;
-import io.endeavour.stocks.entity.stocks.SectorLookup;
-import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.entity.stocks.SubSectorLookup;
+import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.repository.stocks.SubSectorRepository;
 import io.endeavour.stocks.vo.SectorLookupVO;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -41,6 +41,9 @@ public class StockAnalyticsService {
 
     @Autowired
     SubSectorRepository subSectorRepository;
+
+    @Autowired
+    StockPriceHistoryRepository stockPriceHistoryRepository;
 
 @Autowired
     public StockAnalyticsService(StockPriceHistoryDAO stockPriceHistoryDAO,LookupDAO lookupDAO,StockFundamentalsDAO stockFundamentalsDAO){
@@ -100,6 +103,16 @@ public class StockAnalyticsService {
     return stockFundamentalsList;
     }
 
+    public List<StockFundamentals> getStockFundamentalsMarketCapNotNull() {
+        List<StockFundamentals> stockFundamentalsList = stockFundamentalsRepository.findAllByMarketCapNotNull();
+        return stockFundamentalsList;
+    }
+
+    public List<StockFundamentals> getStockFundamentalsMarketCapGreaterThan(BigDecimal marketCap) {
+        List<StockFundamentals> stockFundamentalsList = stockFundamentalsRepository.findAllByMarketCapGreaterThan(marketCap);
+        return stockFundamentalsList;
+    }
+
     public List<SectorLookup> getAllSectorsUsingJPA(){
     List<SectorLookup> sectorLookupList= sectorLookupRepository.findAll();
     return sectorLookupList;
@@ -114,5 +127,19 @@ public class StockAnalyticsService {
     return subSectorLookupList;
     }
 
+    public Optional<StockPriceHistory> getStockPriceHistoryForTickerSymbol(String tickerSymbol, LocalDate tradingDate){
+        StockPriceHistoryPrimaryKey stockPriceHistoryPrimaryKey=new StockPriceHistoryPrimaryKey();
+        stockPriceHistoryPrimaryKey.setTickerSymbol(tickerSymbol);
+        stockPriceHistoryPrimaryKey.setTradingDate(tradingDate);
+        Optional<StockPriceHistory> optionalStockPriceHistory = stockPriceHistoryRepository.findById(stockPriceHistoryPrimaryKey);
+        return optionalStockPriceHistory;
+    }
 
+    public List<StockFundamentals> getStockFundamentalsUsingJPQL() {
+    return stockFundamentalsRepository.findAllMarketCapByJPQL();
+    }
+
+    public List<StockFundamentals> getStockFundamentalsUsingNativeSQL(){
+    return stockFundamentalsRepository.findAllMarketCapNotNullUsingNativeSQL();
+    }
 }

@@ -3,16 +3,20 @@ package io.endeavour.stocks.Controller;
 
 import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.StockPriceHistory;
 import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +81,26 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
         return stockAnalyticsService.getStockFundamentalsUsingJPA();
     }
 
+    @GetMapping("/stock-fundamentals-market-cap")
+    public List<StockFundamentals> getStockFundamentalsMarketCap(@RequestParam String format,@RequestParam(required = false)BigDecimal marketCap) {
+        List<StockFundamentals> stockFundamentals=new ArrayList<>();
+        if (marketCap != null) {
+            stockFundamentals= stockAnalyticsService.getStockFundamentalsMarketCapGreaterThan(marketCap);
+        } else {
+            if ("dsl".equalsIgnoreCase(format)){
+                stockFundamentals= stockAnalyticsService.getStockFundamentalsMarketCapNotNull();
+            }
+            else if("jpql".equalsIgnoreCase(format)){
+                stockFundamentals= stockAnalyticsService.getStockFundamentalsUsingJPQL();
+            }
+            else if("sql".equalsIgnoreCase(format)){
+                stockFundamentals= stockAnalyticsService.getStockFundamentalsUsingNativeSQL();
+            }
+        }
+        return stockFundamentals;
+    }
+
+
     @GetMapping("/sector-lookup-usingJPA")
     public List<SectorLookup> getAllSectorsUsingJPA(){
         return stockAnalyticsService.getAllSectorsUsingJPA();
@@ -96,4 +120,9 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
         return stockAnalyticsService.getSubSectorUsingJPA();
     }
 
-}
+    @GetMapping("/stock-price-history/{tickerSymbol}/{tradingDate}")
+    public ResponseEntity<StockPriceHistory> getStockPriceHistory(@PathVariable String tickerSymbol,@PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate tradingDate){
+    return ResponseEntity.of(stockAnalyticsService.getStockPriceHistoryForTickerSymbol(tickerSymbol,tradingDate));
+    }
+    }
+
