@@ -7,6 +7,9 @@ import io.endeavour.stocks.entity.stocks.StockPriceHistory;
 import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/stocks")
+@Tag(name="Stocks" ,description = "APIs for stocks ")
 public class StockAnalyticsController {
 
     @Autowired
@@ -40,6 +45,8 @@ public class StockAnalyticsController {
     }
 
     @GetMapping("/stock-price-history-date-range/{tickerSymbol}")
+    @Operation(method = "singleStockPriceHistory", description = "get stock price history from db for date range")
+    @ApiResponse(responseCode = "400",description = "return 400 if fromdate is after toDate")
     public List<StockPriceHistoryVO> getStockPriceHistory(@PathVariable String tickerSymbol,
                                                           @RequestParam @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate fromDate,
                                                           @RequestParam @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate toDate){
@@ -123,6 +130,18 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
     @GetMapping("/stock-price-history/{tickerSymbol}/{tradingDate}")
     public ResponseEntity<StockPriceHistory> getStockPriceHistory(@PathVariable String tickerSymbol,@PathVariable @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate tradingDate){
     return ResponseEntity.of(stockAnalyticsService.getStockPriceHistoryForTickerSymbol(tickerSymbol,tradingDate));
+    }
+
+    @GetMapping("/stock-fundamentals/{tickerSymbol}")
+    public ResponseEntity<StockFundamentalHistoryVO> getStockFundamentalHistory(@PathVariable(value = "tickerSymbol") String tickerSymbol,
+                                                                                @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate fromDate,
+                                                                                @RequestParam(value = "toDate") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate toDate){
+        return ResponseEntity.of(stockAnalyticsService.getStockFundamentalHistory(tickerSymbol,fromDate,toDate));
+    }
+
+    @GetMapping("/stock-fundamentals/top-stock-by-sector")
+    public List<TopStockBySectorVO> getTopStockBySector(){
+        return stockAnalyticsService.getTopStockBySector();
     }
     }
 

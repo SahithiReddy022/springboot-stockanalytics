@@ -1,11 +1,15 @@
 package io.endeavour.stocks.dao;
 
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.logging.Logger;
 

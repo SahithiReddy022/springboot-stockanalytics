@@ -9,9 +9,7 @@ import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.repository.stocks.SubSectorRepository;
-import io.endeavour.stocks.vo.SectorLookupVO;
-import io.endeavour.stocks.vo.StockFundamentalsVO;
-import io.endeavour.stocks.vo.StockPriceHistoryVO;
+import io.endeavour.stocks.vo.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,11 +133,31 @@ public class StockAnalyticsService {
         return optionalStockPriceHistory;
     }
 
+    public Optional<StockFundamentalHistoryVO> getStockFundamentalHistory(String tickerSymbol,LocalDate fromDate, LocalDate toDate){
+    Optional<StockFundamentals> stockFundamentalsOptional=stockFundamentalsRepository.findById(tickerSymbol);
+    StockFundamentalHistoryVO stockFundamentalHistoryVO=null;
+
+    if(stockFundamentalsOptional.isPresent()){
+        List<StockPriceHistoryVO> stockPriceHistoryList= stockPriceHistoryDAO.getStockPriceHistory(tickerSymbol,fromDate,toDate);
+        stockFundamentalHistoryVO=new StockFundamentalHistoryVO();
+        stockFundamentalHistoryVO.setTickerSymbol(tickerSymbol);
+        stockFundamentalHistoryVO.setCurrentRatio(stockFundamentalsOptional.get().getCurrentRatio());
+        stockFundamentalHistoryVO.setMarketCap(stockFundamentalsOptional.get().getMarketCap());
+        stockFundamentalHistoryVO.setTradingHistory(stockPriceHistoryList);
+    }
+    Optional<StockFundamentalHistoryVO> stockFundamentalHistoryOptional=Optional.ofNullable(stockFundamentalHistoryVO);
+    return stockFundamentalHistoryOptional;
+    }
+
     public List<StockFundamentals> getStockFundamentalsUsingJPQL() {
     return stockFundamentalsRepository.findAllMarketCapByJPQL();
     }
 
     public List<StockFundamentals> getStockFundamentalsUsingNativeSQL(){
     return stockFundamentalsRepository.findAllMarketCapNotNullUsingNativeSQL();
+    }
+
+    public List<TopStockBySectorVO> getTopStockBySector(){
+    return stockFundamentalsRepository.getTopStockBySector();
     }
 }

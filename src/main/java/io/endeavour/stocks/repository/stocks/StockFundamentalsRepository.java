@@ -1,6 +1,7 @@
 package io.endeavour.stocks.repository.stocks;
 
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,8 @@ public interface StockFundamentalsRepository extends JpaRepository<StockFundamen
     //using native query
     @Query(nativeQuery = true,value = "select * from endeavour.stock_fundamentals where market_cap is not null")
     public List<StockFundamentals> findAllMarketCapNotNullUsingNativeSQL();
+
+    @Query(nativeQuery = true, name = "StockFundamentals.topStockBySector")
+    public List<TopStockBySectorVO> getTopStockBySector();
+
 }
