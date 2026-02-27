@@ -67,6 +67,9 @@ public class StockFundamentals {
     @Column(name = "CURRENT_RATIO")
     private BigDecimal currentRatio;
 
+    @Transient
+    private BigDecimal cumulativeReturn;
+
     public String getTickerSymbol() {
         return tickerSymbol;
     }
@@ -105,6 +108,14 @@ public class StockFundamentals {
 
     public void setCurrentRatio(BigDecimal currentRatio) {
         this.currentRatio = currentRatio;
+    }
+
+    public BigDecimal getCumulativeReturn() {
+        return cumulativeReturn;
+    }
+
+    public void setCumulativeReturn(BigDecimal cumulativeReturn) {
+        this.cumulativeReturn = cumulativeReturn;
     }
 
     @Override

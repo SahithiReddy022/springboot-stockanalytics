@@ -10,6 +10,8 @@ import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.repository.stocks.SubSectorRepository;
 import io.endeavour.stocks.vo.*;
+import io.endeavour.stocks.vo.remote.CumulativeReturnWSInputVO;
+import io.endeavour.stocks.vo.remote.CumulativeReturnWSOutputVO;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 
 
@@ -42,6 +47,9 @@ public class StockAnalyticsService {
 
     @Autowired
     StockPriceHistoryRepository stockPriceHistoryRepository;
+
+    @Autowired
+    StockClientCalculation stockClientCalculation;
 
 @Autowired
     public StockAnalyticsService(StockPriceHistoryDAO stockPriceHistoryDAO,LookupDAO lookupDAO,StockFundamentalsDAO stockFundamentalsDAO){
@@ -159,5 +167,37 @@ public class StockAnalyticsService {
 
     public List<TopStockBySectorVO> getTopStockBySector(){
     return stockFundamentalsRepository.getTopStockBySector();
+    }
+
+    public List<StockFundamentals> getCumulativeReturn(LocalDate fromDate, LocalDate toDate, Integer num){
+    List<StockFundamentals> stockFundamentalsList=stockFundamentalsRepository.findAll();
+
+    List<String> tickerSymbols= stockFundamentalsList.stream()
+            .map(StockFundamentals::getTickerSymbol)
+            .collect(Collectors.toList());
+
+        CumulativeReturnWSInputVO cumulativeReturnWSInputVO=new CumulativeReturnWSInputVO();
+        cumulativeReturnWSInputVO.setTickers(tickerSymbols);
+
+        //call third party service
+        List<CumulativeReturnWSOutputVO> cumulativeReturnWSOutputVOList=stockClientCalculation.getCumulativeReturns(fromDate,
+                toDate, cumulativeReturnWSInputVO);
+        Map<String, BigDecimal> cumulativeReturnMap= cumulativeReturnWSOutputVOList.stream()
+                .collect(Collectors.toMap(CumulativeReturnWSOutputVO::getTickerSymbol, CumulativeReturnWSOutputVO::getCumulativeReturn));
+
+        stockFundamentalsList.stream()
+                .forEach(stockFundamentals ->
+                {
+                    String tickerSymbol= stockFundamentals.getTickerSymbol();
+                    stockFundamentals.setCumulativeReturn(cumulativeReturnMap.get(tickerSymbol));
+                });
+
+        List<StockFundamentals> finalOutputList = stockFundamentalsList.stream()
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() !=null)
+                .sorted(Comparator.comparing(StockFundamentals::getCumulativeReturn).reversed())
+                .limit(num)
+                .collect(Collectors.toList());
+
+        return finalOutputList;
     }
 }

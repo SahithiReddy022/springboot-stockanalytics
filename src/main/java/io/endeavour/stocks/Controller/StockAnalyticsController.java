@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -142,6 +143,14 @@ public List<StockPriceHistoryVO> getStockPriceHistoryP(@RequestBody StockPriceHi
     @GetMapping("/stock-fundamentals/top-stock-by-sector")
     public List<TopStockBySectorVO> getTopStockBySector(){
         return stockAnalyticsService.getTopStockBySector();
+    }
+
+    @GetMapping(value="/stock-fundamentals/top-cumulative-return")
+    public List<StockFundamentals> getCumulativeReturn(@RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                       @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
+                                                       @RequestParam(value="num")Integer num)
+    {
+        return stockAnalyticsService.getCumulativeReturn(fromDate,toDate,num);
     }
     }
 
