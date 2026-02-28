@@ -171,6 +171,10 @@ public class StockAnalyticsService {
 
     public List<StockFundamentals> getCumulativeReturn(LocalDate fromDate, LocalDate toDate, Integer num){
     List<StockFundamentals> stockFundamentalsList=stockFundamentalsRepository.findAll();
+    if(stockFundamentalsList ==null || stockFundamentalsList.isEmpty()){
+        throw new RuntimeException("DB down");
+    }
+
 
     List<String> tickerSymbols= stockFundamentalsList.stream()
             .map(StockFundamentals::getTickerSymbol)
@@ -182,6 +186,10 @@ public class StockAnalyticsService {
         //call third party service
         List<CumulativeReturnWSOutputVO> cumulativeReturnWSOutputVOList=stockClientCalculation.getCumulativeReturns(fromDate,
                 toDate, cumulativeReturnWSInputVO);
+
+        if(cumulativeReturnWSOutputVOList ==null || cumulativeReturnWSOutputVOList.isEmpty()){
+            throw new RuntimeException("StockClientCalculation is down");
+        }
         Map<String, BigDecimal> cumulativeReturnMap= cumulativeReturnWSOutputVOList.stream()
                 .collect(Collectors.toMap(CumulativeReturnWSOutputVO::getTickerSymbol, CumulativeReturnWSOutputVO::getCumulativeReturn));
 
